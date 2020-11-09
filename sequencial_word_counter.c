@@ -4,7 +4,7 @@
 
 char *text;
 
-char keywords[][10] = {"key", "Jesus", "faith", "a", "the", "is"};
+char keywords[][10] = {"key", "devils", "Jesus", "faith", "a", "the", "is"};
 
 int read_text_file()
 {
@@ -49,12 +49,12 @@ void print_results(int *counters, int number_of_keywords)
 
 int isEndOfWord(char x)
 {
-	return x == ' ' || x == ',' || x == '.' || x == ';' || x == '!' || x == '?' || x == ')';
+	return x == ' ' || x == ',' || x == '.' || x == ':' || x == ';' || x == '!' || x == '?' || x == ')' || x == '\n';
 }
 
 int isStartOfWord(char x)
 {
-	return x == ' ' || x == '(';
+	return x == ' ' || x == '\n' || x == '(';
 }
 
 int main(int argc, char *argv[])
