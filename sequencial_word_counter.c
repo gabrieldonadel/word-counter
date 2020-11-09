@@ -3,8 +3,7 @@
 #include <stdlib.h>
 
 char *text;
-
-char keywords[][10] = {"key", "devils", "Jesus", "faith", "a", "the", "is"};
+char keywords[][10] = {"devils", "Jesus", "faith", "a", "the", "is", "thyself", "neighbour", "was", "LORD", "of", "he", "God", "said"};
 
 int read_text_file()
 {
@@ -24,7 +23,6 @@ int read_text_file()
 			text[i] = c;
 		fclose(file);
 
-		printf("chars: %d\n", text_size);
 		return text_size;
 	}
 
@@ -40,16 +38,14 @@ void print_results(int *counters, int number_of_keywords)
 	printf("\n # %-22s%11s #", "Keyword", "Occurrences");
 	printf("\n #####################################");
 	for (int j = 0; j < number_of_keywords; j++)
-	{
 		printf("\n # %-22s%11d #", keywords[j], counters[j]);
-	}
 	printf("\n #####################################\n\n");
 	printf("\033[0m");
 }
 
 int isEndOfWord(char x)
 {
-	return x == ' ' || x == ',' || x == '.' || x == ':' || x == ';' || x == '!' || x == '?' || x == ')' || x == '\n';
+	return x == ' ' || x == ',' || x == '.' || x == ':' || x == ';' || x == '!' || x == '?' || x == ')' || x == '\'' || x == '\n';
 }
 
 int isStartOfWord(char x)
@@ -59,15 +55,13 @@ int isStartOfWord(char x)
 
 int main(int argc, char *argv[])
 {
-	int number_of_keywords = (int)sizeof(keywords) / sizeof(keywords[0]);
-	int counters[number_of_keywords];
-
 	int text_size = read_text_file();
+	int number_of_keywords = (int)sizeof(keywords) / sizeof(keywords[0]);
 
+	// initialize counters array
+	int counters[number_of_keywords];
 	for (int i = 0; i < number_of_keywords; i++)
-	{
 		counters[i] = 0;
-	}
 
 	for (int j = 0; j < number_of_keywords; j++)
 	{
@@ -77,16 +71,11 @@ int main(int argc, char *argv[])
 
 		for (int i = 0; i < text_size; i++)
 		{
-			char ch = *(text + i);
 			if (*(text + i) == keyword[keyword_cursor])
 			{
-				if (keyword_cursor == 0 && ((i + keyword_size) > text_size || *(text + i + keyword_size - 1) != keyword[keyword_size - 1]))
-					i = i + keyword_size - 1;
 				keyword_cursor++;
 				if (keyword_cursor == keyword_size && isEndOfWord(*(text + i + 1)) && (i - keyword_size == 0 || isStartOfWord(*(text + i - keyword_size))))
-				{
 					counters[j]++;
-				}
 			}
 			else if (keyword_cursor)
 				keyword_cursor = 0;
