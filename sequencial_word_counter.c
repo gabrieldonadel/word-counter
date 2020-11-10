@@ -3,7 +3,40 @@
 #include <stdlib.h>
 
 char *text;
-char keywords[][10] = {"devils", "Jesus", "faith", "a", "the", "is", "thyself", "neighbour", "was", "LORD", "of", "he", "God", "said"};
+char keywords[][10] = {
+		"a",
+		"as",
+		"at",
+		"be",
+		"do",
+		"is",
+		"in",
+		"it",
+		"of",
+		"he",
+		"on",
+		"to",
+		"but",
+		"for",
+		"you",
+		"not",
+		"and",
+		"the",
+		"was",
+		"God",
+		"with",
+		"this",
+		"that",
+		"have",
+		"LORD",
+		"said",
+		"faith",
+		"Jesus",
+		"waters",
+		"devils",
+		"thyself",
+		"neighbour",
+};
 
 int read_text_file()
 {
@@ -14,13 +47,12 @@ int read_text_file()
 	if (file)
 	{
 		int text_size = 0;
-		while ((c = getc(file)) != EOF)
-			text_size++;
+		fseek(file, 0L, SEEK_END);
+		text_size = ftell(file);
 
 		text = (char *)malloc(text_size * sizeof(char));
 		rewind(file);
-		for (int i = 0; (c = getc(file)) != EOF; i++)
-			text[i] = c;
+		fread(text, sizeof(char), text_size, file);
 		fclose(file);
 
 		return text_size;
