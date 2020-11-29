@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 
+int tag = 1;
 char *text;
 char keywords[][10] = {
 		"a",
@@ -67,6 +68,7 @@ void print_results(int *counters, int number_of_keywords)
 {
 	printf("\033[0;32m");
 	printf("\n #####################################");
+	printf("\n %-14s%8s%15s", "# ", "Open MPI", " #");
 	printf("\n %-11s%15s%11s", "# ", "Keyword Counter", " #");
 	printf("\n #####################################");
 	printf("\n # %-22s%11s #", "Keyword", "Occurrences");
@@ -124,15 +126,42 @@ int main(int argc, char *argv[])
 			else if (keyword_cursor)
 				keyword_cursor = 0;
 		}
-		printf("%s: %d\n", keywords[j], counters[j / world_size]);
 	}
 
-	// if (world_rank != 0)
-	// {
-	// 	MPI_Finalize();
-	// }
+	MPI_Status status;
+	if (world_rank != 0)
+	{
+		MPI_Send(&counters, number_of_keywords_per_proccess, MPI_INT, 0, tag, MPI_COMM_WORLD);
+		MPI_Finalize();
+	}
+	else
+	{
+		// initialize all counters array
+		int all_counters[number_of_keywords];
+		for (int i = 0; i < number_of_keywords; i++)
+			all_counters[i] = 0;
 
-	// print_results(counters, number_of_keywords);
+		// set world_rank 0 counters
+		for (int i = 0; i < number_of_keywords; i = world_size + i)
+			all_counters[i] = counters[i / world_size];
+
+		// receive other processes counters
+		for (int i = 1; i < world_size; i++)
+		{
+			//create an array to temporarily store other processes counters
+			int *temp_array = malloc(number_of_keywords_per_proccess * sizeof(int));
+			MPI_Recv(temp_array, number_of_keywords_per_proccess, MPI_INT, i, tag, MPI_COMM_WORLD, &status);
+
+			// map other processes counters into all_counters
+			for (int j = i; j < number_of_keywords; j = world_size + j)
+				all_counters[j] = temp_array[j / world_size];
+
+			free(temp_array);
+		}
+
+		print_results(all_counters, number_of_keywords);
+		MPI_Finalize();
+	}
 
 	return 0;
 }
